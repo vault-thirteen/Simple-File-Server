@@ -2,34 +2,35 @@ package sfs
 
 import (
 	"errors"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
 
 	cache "github.com/vault-thirteen/Cache"
 	"github.com/vault-thirteen/auxie/file"
-	"github.com/vault-thirteen/errorz"
-)
-
-const (
-	ErrFolderDoesNotExist = "folder does not exist"
-	ErrFilePathIsNotValid = "file path is not valid"
 )
 
 const (
 	PathLevelUp = ".."
 )
 
+const (
+	ErrFolderDoesNotExist = "folder does not exist"
+	ErrPathIsNotValid     = "path is not valid"
+)
+
 type SimpleFileServer struct {
-	rootFolderPath   string
-	isCachingEnabled bool
-	cache            *cache.Cache[string, []byte]
+	rootFolderPath     string
+	folderDefaultFiles []string
+	isCachingEnabled   bool
+	cache              *cache.Cache[string, []byte]
+
+	// fileExistenceMap caches flags showing existence of a file.
+	// Key: absolute path to file; Value: existence of the file.
+	fileExistenceMap map[string]bool
 }
 
 // NewSimpleFileServer is a constructor of a SimpleFileServer object.
 func NewSimpleFileServer(
 	rootFolderPath string,
+	folderDefaultFiles []string,
 	isCachingEnabled bool,
 	cacheSizeLimit int,
 	cacheVolumeLimit int,
@@ -45,113 +46,15 @@ func NewSimpleFileServer(
 	}
 
 	sfs = &SimpleFileServer{
-		rootFolderPath:   rootFolderPath,
-		isCachingEnabled: isCachingEnabled,
+		rootFolderPath:     rootFolderPath,
+		folderDefaultFiles: folderDefaultFiles,
+		isCachingEnabled:   isCachingEnabled,
 	}
 
 	if sfs.isCachingEnabled {
 		sfs.cache = cache.NewCache[string, []byte](cacheSizeLimit, cacheVolumeLimit, cacheRecordTtl)
+		sfs.fileExistenceMap = map[string]bool{}
 	}
 
 	return sfs, nil
-}
-
-// GetFileContents returns file's contents.
-// File path is a relative path inside the file server's root folder.
-func (sfs *SimpleFileServer) GetFileContents(filePath string) (bytes []byte, fileExists bool, err error) {
-	if sfs.isCachingEnabled {
-		return sfs.getFileContentsUsingCache(filePath)
-	} else {
-		return sfs.getFileContentsWithoutCache(filePath)
-	}
-}
-
-// getFileContentsUsingCache returns file's contents using cache.
-func (sfs *SimpleFileServer) getFileContentsUsingCache(filePath string) (bytes []byte, fileExists bool, err error) {
-	if !sfs.isFilePathValid(filePath) {
-		return nil, false, errors.New(ErrFilePathIsNotValid)
-	}
-
-	filePath = filepath.Join(sfs.rootFolderPath, filePath)
-
-	bytes, err = sfs.cache.GetRecord(filePath)
-	if err == nil {
-		// File is cached.
-		return bytes, true, nil
-	}
-
-	// File is not cached.
-	fileExists, err = file.FileExists(filePath)
-	if err != nil {
-		return nil, false, err
-	}
-	if !fileExists {
-		return nil, false, nil
-	}
-
-	bytes, err = sfs.readFileFromOs(filePath)
-	if err != nil {
-		return nil, true, err
-	}
-
-	err = sfs.cache.AddRecord(filePath, bytes)
-	if err != nil {
-		return nil, true, err
-	}
-
-	return bytes, true, nil
-}
-
-// getFileContentsWithoutCache returns file's contents not using cache.
-func (sfs *SimpleFileServer) getFileContentsWithoutCache(filePath string) (bytes []byte, fileExists bool, err error) {
-	if !sfs.isFilePathValid(filePath) {
-		return nil, false, errors.New(ErrFilePathIsNotValid)
-	}
-
-	filePath = filepath.Join(sfs.rootFolderPath, filePath)
-
-	fileExists, err = file.FileExists(filePath)
-	if err != nil {
-		return nil, false, err
-	}
-	if !fileExists {
-		return nil, false, nil
-	}
-
-	bytes, err = sfs.readFileFromOs(filePath)
-	if err != nil {
-		return nil, true, err
-	}
-
-	return bytes, true, nil
-}
-
-// readFileFromOs reads file's contents from an operating system.
-func (sfs *SimpleFileServer) readFileFromOs(filePath string) (bytes []byte, err error) {
-	var f *os.File
-	f, err = os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		derr := f.Close()
-		if derr != nil {
-			err = errorz.Combine(err, derr)
-		}
-	}()
-
-	bytes, err = io.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes, nil
-}
-
-// isFilePathValid checks validity of the file path.
-func (sfs *SimpleFileServer) isFilePathValid(filePath string) bool {
-	if strings.Contains(filePath, PathLevelUp) {
-		return false
-	}
-	return true
 }

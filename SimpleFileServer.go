@@ -22,13 +22,15 @@ const (
 )
 
 type SimpleFileServer struct {
-	rootFolderPath string
-	cache          *cache.Cache[string, []byte]
+	rootFolderPath   string
+	isCachingEnabled bool
+	cache            *cache.Cache[string, []byte]
 }
 
 // NewSimpleFileServer is a constructor of a SimpleFileServer object.
 func NewSimpleFileServer(
 	rootFolderPath string,
+	isCachingEnabled bool,
 	cacheSizeLimit int,
 	cacheVolumeLimit int,
 	cacheRecordTtl uint,
@@ -41,11 +43,15 @@ func NewSimpleFileServer(
 	if !ok {
 		return nil, errors.New(ErrFolderDoesNotExist)
 	}
+
 	sfs = &SimpleFileServer{
-		rootFolderPath: rootFolderPath,
+		rootFolderPath:   rootFolderPath,
+		isCachingEnabled: isCachingEnabled,
 	}
 
-	sfs.cache = cache.NewCache[string, []byte](cacheSizeLimit, cacheVolumeLimit, cacheRecordTtl)
+	if sfs.isCachingEnabled {
+		sfs.cache = cache.NewCache[string, []byte](cacheSizeLimit, cacheVolumeLimit, cacheRecordTtl)
+	}
 
 	return sfs, nil
 }
@@ -53,6 +59,15 @@ func NewSimpleFileServer(
 // GetFileContents returns file's contents.
 // File path is a relative path inside the file server's root folder.
 func (sfs *SimpleFileServer) GetFileContents(filePath string) (bytes []byte, fileExists bool, err error) {
+	if sfs.isCachingEnabled {
+		return sfs.getFileContentsUsingCache(filePath)
+	} else {
+		return sfs.getFileContentsWithoutCache(filePath)
+	}
+}
+
+// getFileContentsUsingCache returns file's contents using cache.
+func (sfs *SimpleFileServer) getFileContentsUsingCache(filePath string) (bytes []byte, fileExists bool, err error) {
 	if !sfs.isFilePathValid(filePath) {
 		return nil, false, errors.New(ErrFilePathIsNotValid)
 	}
@@ -80,6 +95,30 @@ func (sfs *SimpleFileServer) GetFileContents(filePath string) (bytes []byte, fil
 	}
 
 	err = sfs.cache.AddRecord(filePath, bytes)
+	if err != nil {
+		return nil, true, err
+	}
+
+	return bytes, true, nil
+}
+
+// getFileContentsWithoutCache returns file's contents not using cache.
+func (sfs *SimpleFileServer) getFileContentsWithoutCache(filePath string) (bytes []byte, fileExists bool, err error) {
+	if !sfs.isFilePathValid(filePath) {
+		return nil, false, errors.New(ErrFilePathIsNotValid)
+	}
+
+	filePath = filepath.Join(sfs.rootFolderPath, filePath)
+
+	fileExists, err = file.FileExists(filePath)
+	if err != nil {
+		return nil, false, err
+	}
+	if !fileExists {
+		return nil, false, nil
+	}
+
+	bytes, err = sfs.readFileFromOs(filePath)
 	if err != nil {
 		return nil, true, err
 	}

@@ -57,3 +57,8 @@ func shortenPath(path string) (shortenedPath string) {
 	shortenedPath = strings.TrimSuffix(shortenedPath, BackwardSlashString)
 	return shortenedPath
 }
+
+// GetAbsolutePath returns an absolute path from a relative one.
+func (sfs *SimpleFileServer) GetAbsolutePath(relPath string) (absPath string) {
+	return filepath.Join(sfs.rootFolderPath, relPath)
+}

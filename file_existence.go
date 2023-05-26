@@ -6,14 +6,14 @@ import "github.com/vault-thirteen/auxie/file"
 // cache.
 func (sfs *SimpleFileServer) getFileExistenceUsingCache(absFilePath string) (fileExists bool, err error) {
 	var ok bool
-	fileExists, ok = sfs.fileExistenceMap[absFilePath]
+	fileExists, ok = sfs.fileExistenceMap.GetValue(absFilePath)
 	if !ok {
 		fileExists, err = file.FileExists(absFilePath)
 		if err != nil {
 			return false, err
 		}
 
-		sfs.fileExistenceMap[absFilePath] = fileExists
+		sfs.fileExistenceMap.SetValue(absFilePath, fileExists)
 	}
 
 	return fileExists, nil

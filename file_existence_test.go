@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	ssc "github.com/vault-thirteen/Simple-File-Server/SSC"
 	"github.com/vault-thirteen/tester"
 )
 
@@ -17,13 +18,13 @@ func Test_getFileExistenceUsingCache(t *testing.T) {
 
 	// Test #1.
 	sfs = &SimpleFileServer{
-		fileExistenceMap: map[string]bool{},
+		fileExistenceMap: ssc.NewSSC(10),
 	}
 	path = filepath.Join(TestFolderA, TestFolderB, TestFile)
 	fileExists, err = sfs.getFileExistenceUsingCache(path)
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(fileExists, true)
-	fileExists, ok = sfs.fileExistenceMap[path]
+	fileExists, ok = sfs.fileExistenceMap.GetValue(path)
 	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(ok, true)
 }

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/vault-thirteen/tester"
+	"github.com/vault-thirteen/auxie/tester"
 )
 
 func Test_GetFile(t *testing.T) {

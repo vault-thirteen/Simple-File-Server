@@ -3,7 +3,7 @@ package sfs
 import (
 	"testing"
 
-	"github.com/vault-thirteen/tester"
+	"github.com/vault-thirteen/auxie/tester"
 )
 
 const (

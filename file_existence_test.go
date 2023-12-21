@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	ssc "github.com/vault-thirteen/Simple-File-Server/SSC"
-	"github.com/vault-thirteen/tester"
+	"github.com/vault-thirteen/auxie/tester"
 )
 
 func Test_getFileExistenceUsingCache(t *testing.T) {

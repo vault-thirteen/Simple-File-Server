@@ -5,7 +5,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/vault-thirteen/errorz"
+	ae "github.com/vault-thirteen/auxie/errors"
 )
 
 // IsPathValid checks validity of the path.
@@ -26,7 +26,7 @@ func ReadFileFromOs(absFilePath string) (bytes []byte, err error) {
 	defer func() {
 		derr := f.Close()
 		if derr != nil {
-			err = errorz.Combine(err, derr)
+			err = ae.Combine(err, derr)
 		}
 	}()
 

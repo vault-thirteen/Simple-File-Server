@@ -23,11 +23,7 @@ func (sfs *SimpleFileServer) GetFolderDefaultFilename(relPath string) (fileName 
 	for _, fdf := range sfs.folderDefaultFiles {
 		absFilePath = filepath.Join(absFolderPath, fdf)
 
-		if sfs.isCachingEnabled {
-			fileExists, err = sfs.getFileExistenceUsingCache(absFilePath)
-		} else {
-			fileExists, err = sfs.getFileExistenceWithoutCache(absFilePath)
-		}
+		fileExists, err = sfs.getFileExistenceWithoutCache(absFilePath)
 		if err != nil {
 			return "", false, err
 		}

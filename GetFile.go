@@ -31,20 +31,13 @@ func (sfs *SimpleFileServer) getFileUsingCache(absFilePath string) (bytes []byte
 		return bytes, true, nil
 	}
 
-	// File is not cached. Check existence and save the file into cache.
-	// Here, we do not use cache for existence flags because ordinary files are
-	// very volatile.
-	fileExists, err = sfs.getFileExistenceWithoutCache(absFilePath)
+	// File is not cached.
+	bytes, fileExists, err = sfs.getFileWithoutCache(absFilePath)
 	if err != nil {
 		return nil, false, err
 	}
 	if !fileExists {
 		return nil, false, nil
-	}
-
-	bytes, err = ReadFileFromOs(absFilePath)
-	if err != nil {
-		return nil, true, err
 	}
 
 	err = sfs.cache.AddRecord(absFilePath, bytes)

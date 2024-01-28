@@ -24,9 +24,9 @@ func (sfs *SimpleFileServer) GetFolder(relPath string) (bytes []byte, fileExists
 		absFilePath = filepath.Join(absFolderPath, fdf)
 
 		if sfs.isCachingEnabled {
-			bytes, fileExists, err = sfs.getDefaultFileUsingCache(absFilePath)
+			bytes, fileExists, err = sfs.getFileUsingCache(absFilePath)
 		} else {
-			bytes, fileExists, err = sfs.getDefaultFileWithoutCache(absFilePath)
+			bytes, fileExists, err = sfs.getFileWithoutCache(absFilePath)
 		}
 		if err != nil {
 			return nil, false, err
@@ -37,41 +37,4 @@ func (sfs *SimpleFileServer) GetFolder(relPath string) (bytes []byte, fileExists
 	}
 
 	return nil, false, nil
-}
-
-// getDefaultFileUsingCache returns contents and a flag showing existence of the
-// default file using cache. Path is absolute.
-func (sfs *SimpleFileServer) getDefaultFileUsingCache(absFilePath string) (bytes []byte, fileExists bool, err error) {
-	fileExists, err = sfs.getFileExistenceUsingCache(absFilePath)
-	if err != nil {
-		return nil, false, err
-	}
-	if !fileExists {
-		return nil, false, nil
-	}
-
-	bytes, err = sfs.cache.GetRecord(absFilePath)
-	if err == nil {
-		// File is cached. Everything is good.
-		return bytes, true, nil
-	}
-
-	// File is not cached. Save the file into cache.
-	bytes, err = ReadFileFromOs(absFilePath)
-	if err != nil {
-		return nil, true, err
-	}
-
-	err = sfs.cache.AddRecord(absFilePath, bytes)
-	if err != nil {
-		return nil, true, err
-	}
-
-	return bytes, true, nil
-}
-
-// getDefaultFileWithoutCache returns contents and a flag showing existence of
-// the default file not using cache. Path is absolute.
-func (sfs *SimpleFileServer) getDefaultFileWithoutCache(absFilePath string) (bytes []byte, fileExists bool, err error) {
-	return sfs.getFileWithoutCache(absFilePath)
 }

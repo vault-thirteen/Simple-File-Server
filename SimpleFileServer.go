@@ -4,7 +4,6 @@ import (
 	"errors"
 
 	cache "github.com/vault-thirteen/Cache"
-	ssc "github.com/vault-thirteen/Simple-File-Server/SSC"
 	"github.com/vault-thirteen/auxie/file"
 )
 
@@ -21,11 +20,9 @@ type SimpleFileServer struct {
 	rootFolderPath     string
 	folderDefaultFiles []string
 	isCachingEnabled   bool
-	cache              *cache.Cache[string, []byte]
 
-	// fileExistenceMap caches flags showing existence of a file.
-	// Key: absolute path to file; Value: existence of the file.
-	fileExistenceMap *ssc.SSC
+	// Cached contents of files.
+	cache *cache.Cache[string, []byte]
 }
 
 // NewSimpleFileServer is a constructor of a SimpleFileServer object.
@@ -54,7 +51,6 @@ func NewSimpleFileServer(
 
 	if sfs.isCachingEnabled {
 		sfs.cache = cache.NewCache[string, []byte](cacheSizeLimit, cacheVolumeLimit, cacheRecordTtl)
-		sfs.fileExistenceMap = ssc.NewSSC(cacheSizeLimit)
 	}
 
 	return sfs, nil

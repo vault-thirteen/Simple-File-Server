@@ -13,6 +13,7 @@ func IsPathValid(path string) bool {
 	if strings.Contains(path, PathLevelUp) {
 		return false
 	}
+
 	return true
 }
 

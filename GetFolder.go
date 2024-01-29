@@ -17,16 +17,14 @@ func (sfs *SimpleFileServer) GetFolder(relPath string) (bytes []byte, fileExists
 		return nil, false, errors.New(ErrPathIsNotValid)
 	}
 
-	absFolderPath := filepath.Join(sfs.rootFolderPath, relPath)
-
-	var absFilePath string
+	var relFilePath string
 	for _, fdf := range sfs.folderDefaultFiles {
-		absFilePath = filepath.Join(absFolderPath, fdf)
+		relFilePath = filepath.Join(relPath, fdf)
 
 		if sfs.isCachingEnabled {
-			bytes, fileExists, err = sfs.getFileUsingCache(absFilePath)
+			bytes, fileExists, err = sfs.getFileUsingCache(relFilePath)
 		} else {
-			bytes, fileExists, err = sfs.getFileWithoutCache(absFilePath)
+			bytes, fileExists, err = sfs.getFileWithoutCache(relFilePath)
 		}
 		if err != nil {
 			return nil, false, err

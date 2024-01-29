@@ -13,26 +13,24 @@ func (sfs *SimpleFileServer) GetFile(relPath string) (bytes []byte, fileExists b
 		return nil, false, errors.New(ErrPathIsNotValid)
 	}
 
-	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
-
 	if sfs.isCachingEnabled {
-		return sfs.getFileUsingCache(absFilePath)
+		return sfs.getFileUsingCache(relPath)
 	} else {
-		return sfs.getFileWithoutCache(absFilePath)
+		return sfs.getFileWithoutCache(relPath)
 	}
 }
 
 // getFileUsingCache returns contents and a flag showing existence of the file
 // using cache. Path is absolute.
-func (sfs *SimpleFileServer) getFileUsingCache(absFilePath string) (bytes []byte, fileExists bool, err error) {
-	bytes, err = sfs.cache.GetRecord(absFilePath)
+func (sfs *SimpleFileServer) getFileUsingCache(relPath string) (bytes []byte, fileExists bool, err error) {
+	bytes, err = sfs.cache.GetRecord(relPath)
 	if err == nil {
 		// File is cached. Everything is good.
 		return bytes, true, nil
 	}
 
 	// File is not cached.
-	bytes, fileExists, err = sfs.getFileWithoutCache(absFilePath)
+	bytes, fileExists, err = sfs.getFileWithoutCache(relPath)
 	if err != nil {
 		return nil, false, err
 	}
@@ -40,7 +38,7 @@ func (sfs *SimpleFileServer) getFileUsingCache(absFilePath string) (bytes []byte
 		return nil, false, nil
 	}
 
-	err = sfs.cache.AddRecord(absFilePath, bytes)
+	err = sfs.cache.AddRecord(relPath, bytes)
 	if err != nil {
 		return nil, true, err
 	}
@@ -50,7 +48,9 @@ func (sfs *SimpleFileServer) getFileUsingCache(absFilePath string) (bytes []byte
 
 // getFileWithoutCache returns contents and a flag showing existence of the file
 // not using cache. Path is absolute.
-func (sfs *SimpleFileServer) getFileWithoutCache(absFilePath string) (bytes []byte, fileExists bool, err error) {
+func (sfs *SimpleFileServer) getFileWithoutCache(relPath string) (bytes []byte, fileExists bool, err error) {
+	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
+
 	fileExists, err = sfs.getFileExistenceWithoutCache(absFilePath)
 	if err != nil {
 		return nil, false, err

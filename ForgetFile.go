@@ -2,7 +2,6 @@ package sfs
 
 import (
 	"errors"
-	"path/filepath"
 )
 
 // ForgetFile removes a record about the specified file from cache. Path is a
@@ -12,9 +11,7 @@ func (sfs *SimpleFileServer) ForgetFile(relPath string) (err error) {
 		return errors.New(ErrPathIsNotValid)
 	}
 
-	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
-
-	_, err = sfs.cache.RemoveRecord(absFilePath)
+	_, err = sfs.cache.RemoveRecord(relPath)
 	if err != nil {
 		return err
 	}

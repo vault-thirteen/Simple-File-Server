@@ -8,5 +8,5 @@ github.com/rogpeppe/go-internal v1.9.0 h1:73kH8U+JUqXU8lRuOHeVHaa/SZPifC7BkcraZV
 github.com/rogpeppe/go-internal v1.9.0/go.mod h1:WtVeX8xhTBvf0smdhujwtBcq4Qrzq/fJaraNFVN+nFs=
 github.com/vault-thirteen/Cache v0.12.11 h1:UpaPv20uK0RcS1Ro3MiMPnSQPI3ChsPqO3bD9JlraBg=
 github.com/vault-thirteen/Cache v0.12.11/go.mod h1:KeKzXYQSTjKmKmh+N4yPvIEiS8Vl9qqzVnMzDS4DPbI=
-github.com/vault-thirteen/auxie v0.27.2 h1:B6a6CSMlzi0nFwdaePri6sy4xWgNOamKP56K/DR11uo=
-github.com/vault-thirteen/auxie v0.27.2/go.mod h1:G+0ady0CsIpa3BAzh+MjnhPL4Xdy6IFi7Bzj76SI8NA=
+github.com/vault-thirteen/auxie v0.28.0 h1:F6bYX7dKZMaBaV6+J/XGm1yQYMQj8RrFZLZkk8y/F1Q=
+github.com/vault-thirteen/auxie v0.28.0/go.mod h1:k3TIODgx/Tzsf2xAlJZzR0uptY2Fn6YH3+DSURr9dDI=

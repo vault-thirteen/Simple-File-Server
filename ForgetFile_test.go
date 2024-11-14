@@ -25,8 +25,8 @@ func Test_ForgetFile(t *testing.T) {
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, true, 5, 100, 60)
 	aTest.MustBeNoError(err)
 	//
-	_, _, err = sfs.GetFile(TestFile)
+	_, _, err = sfs.GetFile(TestFileA)
 	aTest.MustBeNoError(err)
-	err = sfs.ForgetFile(TestFile)
+	err = sfs.ForgetFile(TestFileA)
 	aTest.MustBeNoError(err)
 }

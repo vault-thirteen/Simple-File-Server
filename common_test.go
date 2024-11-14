@@ -9,7 +9,8 @@ import (
 const (
 	TestFolderA           = "test"
 	TestFolderB           = "data"
-	TestFile              = "a.txt"
+	TestFileA             = "a.txt"
+	TestFileIndex         = "index.html"
 	TestNonExistentFile   = "non-existent-file"
 	TestNonExistentFolder = "non-existent-folder"
 )

@@ -29,7 +29,7 @@ func Test_GetFile(t *testing.T) {
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.GetFile(TestFile)
+	bytes, fileExists, err = sfs.GetFile(TestFileA)
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))
@@ -57,13 +57,13 @@ func Test_getFileUsingCache(t *testing.T) {
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, true, 100, 1_000_000, 60)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.getFileUsingCache(TestFile)
+	bytes, fileExists, err = sfs.getFileUsingCache(TestFileA)
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))
 
 	// Test #2.2. File exists and cache is set.
-	bytes, fileExists, err = sfs.getFileUsingCache(TestFile)
+	bytes, fileExists, err = sfs.getFileUsingCache(TestFileA)
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))
@@ -91,7 +91,7 @@ func Test_getFileWithoutCache(t *testing.T) {
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.getFileWithoutCache(TestFile)
+	bytes, fileExists, err = sfs.getFileWithoutCache(TestFileA)
 	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))

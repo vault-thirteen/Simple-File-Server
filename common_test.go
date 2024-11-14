@@ -11,6 +11,7 @@ const (
 	TestFolderB           = "data"
 	TestFileA             = "a.txt"
 	TestFileIndex         = "index.html"
+	TestFileX             = "x.tmp.txt"
 	TestNonExistentFile   = "non-existent-file"
 	TestNonExistentFolder = "non-existent-folder"
 )

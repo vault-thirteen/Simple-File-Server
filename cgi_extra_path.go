@@ -26,12 +26,10 @@ func (sfs *SimpleFileServer) FindExtraPath(relPath string) (path string, extraPa
 	curPath = strings.TrimSuffix(curPath, BackwardSlashString)
 
 	var fileExists bool
-	var absFilePath string
 
 	for {
 		// Check.
-		absFilePath = filepath.Join(sfs.rootFolderPath, curPath)
-		fileExists, err = sfs.getFileExistenceWithoutCache(absFilePath)
+		fileExists, err = sfs.fileExistsInStorage(curPath)
 		if (err != nil) && (err.Error() != file.ErrObjectIsNotFile) {
 			return "", "", err
 		}

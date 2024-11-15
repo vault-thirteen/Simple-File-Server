@@ -10,7 +10,6 @@ import (
 func Test_GetFile(t *testing.T) {
 	var aTest = tester.New(t)
 	var bytes []byte
-	var fileExists bool
 	var err error
 	var sfs *SimpleFileServer
 
@@ -19,60 +18,53 @@ func Test_GetFile(t *testing.T) {
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.GetFile("x/../x")
+	bytes, err = sfs.GetFile("x/../x")
 	aTest.MustBeAnError(err)
-	aTest.MustBeEqual(fileExists, false)
 	aTest.MustBeEqual(bytes, []byte(nil))
 
-	// Test #2. Valid path.
+	// Test #2. No caching.
 	existingDataFolder = filepath.Join(TestFolderA, TestFolderB)
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.GetFile(TestFileA)
+	bytes, err = sfs.GetFile(TestFileA)
 	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileExists, true)
+	aTest.MustBeEqual(bytes, []byte("This is a test file."))
+
+	// Test #2. File is in cache.
+	existingDataFolder = filepath.Join(TestFolderA, TestFolderB)
+	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
+	aTest.MustBeNoError(err)
+	//
+	bytes, err = sfs.GetFile(TestFileA)
+	aTest.MustBeNoError(err)
+	aTest.MustBeEqual(bytes, []byte("This is a test file."))
+	bytes, err = sfs.GetFile(TestFileA)
+	aTest.MustBeNoError(err)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))
 }
 
 func Test_getFileUsingCache(t *testing.T) {
 	var aTest = tester.New(t)
 	var bytes []byte
-	var fileExists bool
 	var err error
 	var sfs *SimpleFileServer
 
-	// Test #1. File does not exist.
+	// Test #1.
 	existingDataFolder := filepath.Join(TestFolderA, TestFolderB)
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, true, 100, 1_000_000, 60)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.getFileUsingCache(TestNonExistentFile)
+	_, err = sfs.GetFile(TestFileA)
 	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileExists, false)
-	aTest.MustBeEqual(bytes, []byte(nil))
-
-	// Test #2.1. File exists and cache is empty.
-	existingDataFolder = filepath.Join(TestFolderA, TestFolderB)
-	sfs, err = NewSimpleFileServer(existingDataFolder, nil, true, 100, 1_000_000, 60)
+	bytes, err = sfs.getFileUsingCache(TestFileA)
 	aTest.MustBeNoError(err)
-	//
-	bytes, fileExists, err = sfs.getFileUsingCache(TestFileA)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileExists, true)
-	aTest.MustBeEqual(bytes, []byte("This is a test file."))
-
-	// Test #2.2. File exists and cache is set.
-	bytes, fileExists, err = sfs.getFileUsingCache(TestFileA)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))
 }
 
 func Test_getFileWithoutCache(t *testing.T) {
 	var aTest = tester.New(t)
 	var bytes []byte
-	var fileExists bool
 	var err error
 	var sfs *SimpleFileServer
 
@@ -81,18 +73,15 @@ func Test_getFileWithoutCache(t *testing.T) {
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.getFileWithoutCache(TestNonExistentFile)
-	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileExists, false)
-	aTest.MustBeEqual(bytes, []byte(nil))
+	bytes, err = sfs.getFileWithoutCache(TestNonExistentFile)
+	aTest.MustBeAnError(err)
 
 	// Test #2. File exists.
 	existingDataFolder = filepath.Join(TestFolderA, TestFolderB)
 	sfs, err = NewSimpleFileServer(existingDataFolder, nil, false, 0, 0, 0)
 	aTest.MustBeNoError(err)
 	//
-	bytes, fileExists, err = sfs.getFileWithoutCache(TestFileA)
+	bytes, err = sfs.getFileWithoutCache(TestFileA)
 	aTest.MustBeNoError(err)
-	aTest.MustBeEqual(fileExists, true)
 	aTest.MustBeEqual(bytes, []byte("This is a test file."))
 }

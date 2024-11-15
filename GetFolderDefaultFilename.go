@@ -8,29 +8,28 @@ import (
 // GetFolderDefaultFilename returns name of the first found default file of a
 // folder and a flag showing existence of the default file. Path is a relative
 // path inside the file server's root folder.
-func (sfs *SimpleFileServer) GetFolderDefaultFilename(relPath string) (fileName string, fileExists bool, err error) {
+func (sfs *SimpleFileServer) GetFolderDefaultFilename(folderRelPath string) (fileName string, err error) {
 	if len(sfs.folderDefaultFiles) == 0 {
-		return "", false, nil
+		return "", nil
 	}
 
-	if !IsPathValid(relPath) {
-		return "", false, errors.New(ErrPathIsNotValid)
+	if !IsPathValid(folderRelPath) {
+		return "", errors.New(ErrPathIsNotValid)
 	}
 
-	absFolderPath := filepath.Join(sfs.rootFolderPath, relPath)
-
-	var absFilePath string
+	var fileRelPath string
+	var fileExists bool
 	for _, fdf := range sfs.folderDefaultFiles {
-		absFilePath = filepath.Join(absFolderPath, fdf)
+		fileRelPath = filepath.Join(folderRelPath, fdf)
 
-		fileExists, err = sfs.getFileExistenceWithoutCache(absFilePath)
+		fileExists, err = sfs.FileExists(fileRelPath)
 		if err != nil {
-			return "", false, err
+			return "", err
 		}
 		if fileExists {
-			return fdf, true, nil
+			return fdf, nil
 		}
 	}
 
-	return "", false, nil
+	return "", errors.New(ErrFileIsNotFound)
 }

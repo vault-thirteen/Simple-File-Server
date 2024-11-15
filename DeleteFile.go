@@ -7,12 +7,11 @@ import (
 
 // DeleteFile deletes a file from the storage.
 func (sfs *SimpleFileServer) DeleteFile(relPath string) (err error) {
-	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
-
-	err = os.Remove(absFilePath)
-	if err != nil {
-		return err
+	if sfs.isCachingEnabled {
+		_, _ = sfs.cache.RemoveRecord(relPath)
 	}
 
-	return nil
+	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
+
+	return os.Remove(absFilePath)
 }

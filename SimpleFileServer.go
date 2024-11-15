@@ -14,6 +14,7 @@ const (
 const (
 	ErrFolderDoesNotExist = "folder does not exist"
 	ErrPathIsNotValid     = "path is not valid"
+	ErrFileIsNotFound     = "file is not found"
 )
 
 type SimpleFileServer struct {

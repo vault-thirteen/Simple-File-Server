@@ -4,9 +4,15 @@ import (
 	"errors"
 )
 
-// ForgetFile removes a record about the specified file from cache. Path is a
-// relative path inside the file server's root folder.
+const (
+	Err_CacheIsDisabled = "cache is disabled"
+)
+
 func (sfs *SimpleFileServer) ForgetFile(relPath string) (err error) {
+	if !sfs.isCachingEnabled {
+		return errors.New(Err_CacheIsDisabled)
+	}
+
 	if !IsPathValid(relPath) {
 		return errors.New(ErrPathIsNotValid)
 	}

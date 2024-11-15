@@ -1,11 +1,7 @@
 package sfs
 
 import (
-	"io"
-	"os"
 	"strings"
-
-	ae "github.com/vault-thirteen/auxie/errors"
 )
 
 // IsPathValid checks validity of the path.
@@ -15,28 +11,6 @@ func IsPathValid(path string) bool {
 	}
 
 	return true
-}
-
-// ReadFileFromOs reads file's contents from an operating system.
-func ReadFileFromOs(absFilePath string) (bytes []byte, err error) {
-	var f *os.File
-	f, err = os.Open(absFilePath)
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		derr := f.Close()
-		if derr != nil {
-			err = ae.Combine(err, derr)
-		}
-	}()
-
-	bytes, err = io.ReadAll(f)
-	if err != nil {
-		return nil, err
-	}
-
-	return bytes, nil
 }
 
 // IsPathFolder checks whether the specified path is a file or a directory.

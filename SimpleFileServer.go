@@ -3,7 +3,7 @@ package sfs
 import (
 	"errors"
 
-	cache "github.com/vault-thirteen/Cache"
+	"github.com/vault-thirteen/Cache/VL"
 	"github.com/vault-thirteen/auxie/file"
 )
 
@@ -23,7 +23,7 @@ type SimpleFileServer struct {
 	isCachingEnabled   bool
 
 	// Cached contents of files.
-	cache *cache.Cache[string, []byte]
+	cache *vl.Cache[string, []byte]
 }
 
 // NewSimpleFileServer is a constructor of a SimpleFileServer object.
@@ -51,7 +51,7 @@ func NewSimpleFileServer(
 	}
 
 	if sfs.isCachingEnabled {
-		sfs.cache = cache.NewCache[string, []byte](cacheSizeLimit, cacheVolumeLimit, cacheRecordTtl)
+		sfs.cache = vl.NewCache[string, []byte](cacheSizeLimit, cacheVolumeLimit, cacheRecordTtl)
 	}
 
 	return sfs, nil

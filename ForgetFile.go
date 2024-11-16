@@ -13,5 +13,6 @@ func (sfs *SimpleFileServer) ForgetFile(relPath string) (err error) {
 		return errors.New(Err_CacheIsDisabled)
 	}
 
-	return sfs.deleteFileFromCache(relPath)
+	sfs.deleteFileFromCache(relPath)
+	return nil
 }

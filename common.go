@@ -15,7 +15,6 @@ const (
 	Err_CgiExtraPathIsNotFound = "CGI extra path is not found"
 	Err_ActionIsImpossible     = "action is impossible"
 	Err_CacheIsDisabled        = "cache is disabled"
-	Err_FileIsNotFound         = "file is not found"
 	Err_FolderDoesNotExist     = "folder does not exist"
 	Err_PathIsNotValid         = "path is not valid"
 )

@@ -5,6 +5,9 @@ import (
 	"path/filepath"
 )
 
+// GetFolderDefaultFilename returns a first found default file name for the
+// folder. If no default files are set, an empty string is returned. If default
+// files are set, but none is found, an empty string is returned.
 func (sfs *SimpleFileServer) GetFolderDefaultFilename(folderRelPath string) (fileName string, err error) {
 	if len(sfs.folderDefaultFiles) == 0 {
 		return "", nil
@@ -40,5 +43,5 @@ func (sfs *SimpleFileServer) getFolderDefaultFilenameFromStorage(folderRelPath s
 		}
 	}
 
-	return "", errors.New(Err_FileIsNotFound)
+	return "", nil
 }

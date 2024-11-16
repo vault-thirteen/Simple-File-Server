@@ -5,18 +5,27 @@ import (
 	"path/filepath"
 )
 
-// GetFolderDefaultFilename returns name of the first found default file of a
-// folder and a flag showing existence of the default file. Path is a relative
-// path inside the file server's root folder.
 func (sfs *SimpleFileServer) GetFolderDefaultFilename(folderRelPath string) (fileName string, err error) {
 	if len(sfs.folderDefaultFiles) == 0 {
 		return "", nil
 	}
 
 	if !IsPathValid(folderRelPath) {
-		return "", errors.New(ErrPathIsNotValid)
+		return "", errors.New(Err_PathIsNotValid)
 	}
 
+	if !sfs.isCachingEnabled {
+		return sfs.getFolderDefaultFilenameFromStorage(folderRelPath)
+	}
+
+	return sfs.getFolderDefaultFilenameFromStorage(folderRelPath)
+}
+
+func (sfs *SimpleFileServer) getFolderDefaultFilenameFromCache(folderRelPath string) (fileName string, err error) {
+	return "", errors.New(Err_ActionIsImpossible)
+}
+
+func (sfs *SimpleFileServer) getFolderDefaultFilenameFromStorage(folderRelPath string) (fileName string, err error) {
 	var fileRelPath string
 	var fileExists bool
 	for _, fdf := range sfs.folderDefaultFiles {
@@ -31,5 +40,5 @@ func (sfs *SimpleFileServer) GetFolderDefaultFilename(folderRelPath string) (fil
 		}
 	}
 
-	return "", errors.New(ErrFileIsNotFound)
+	return "", errors.New(Err_FileIsNotFound)
 }

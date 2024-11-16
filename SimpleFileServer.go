@@ -7,16 +7,6 @@ import (
 	"github.com/vault-thirteen/auxie/file"
 )
 
-const (
-	PathLevelUp = ".."
-)
-
-const (
-	ErrFolderDoesNotExist = "folder does not exist"
-	ErrPathIsNotValid     = "path is not valid"
-	ErrFileIsNotFound     = "file is not found"
-)
-
 type SimpleFileServer struct {
 	rootFolderPath     string
 	folderDefaultFiles []string
@@ -41,7 +31,7 @@ func NewSimpleFileServer(
 		return nil, err
 	}
 	if !ok {
-		return nil, errors.New(ErrFolderDoesNotExist)
+		return nil, errors.New(Err_FolderDoesNotExist)
 	}
 
 	sfs = &SimpleFileServer{

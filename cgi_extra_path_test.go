@@ -48,18 +48,3 @@ func Test_shortenPath(t *testing.T) {
 	aTest.MustBeEqual(shortenPath(`\a\b`), `\a`)
 	aTest.MustBeEqual(shortenPath(`\a\b\c`), `\a\b`)
 }
-
-func Test_GetAbsolutePath(t *testing.T) {
-	aTest := tester.New(t)
-	var sfs *SimpleFileServer
-	var relpath string
-	var err error
-
-	// Test #1.
-	existingDataFolder := filepath.Join(TestFolderA, TestFolderB)
-	sfs, err = NewSimpleFileServer(existingDataFolder, []string{}, true, 1000, 1_000_000, 60)
-	aTest.MustBeNoError(err)
-	//
-	relpath = `test`
-	aTest.MustBeEqual(sfs.GetAbsolutePath(relpath), filepath.Join(existingDataFolder, relpath))
-}

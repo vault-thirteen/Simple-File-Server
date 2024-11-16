@@ -8,15 +8,6 @@ import (
 	"github.com/vault-thirteen/auxie/file"
 )
 
-const (
-	ErrCgiExtraPathIsNotFound = "CGI extra path is not found"
-)
-
-const (
-	ForwardSlashString  = string(`/`)
-	BackwardSlashString = string(`\`)
-)
-
 // FindExtraPath tries to find CGI extra path.
 // "Extra Path" is a CGI interface feature that allows to make crazy-looking
 // URLs which are impossible to be parsed, something like the following:
@@ -45,7 +36,7 @@ func (sfs *SimpleFileServer) FindExtraPath(relPath string) (path string, extraPa
 		}
 	}
 
-	return "", "", errors.New(ErrCgiExtraPathIsNotFound)
+	return "", "", errors.New(Err_CgiExtraPathIsNotFound)
 }
 
 // shortenPath trims the last segment of the path.
@@ -54,9 +45,4 @@ func shortenPath(path string) (shortenedPath string) {
 	shortenedPath = strings.TrimSuffix(dir, ForwardSlashString)
 	shortenedPath = strings.TrimSuffix(shortenedPath, BackwardSlashString)
 	return shortenedPath
-}
-
-// GetAbsolutePath returns an absolute path from a relative one.
-func (sfs *SimpleFileServer) GetAbsolutePath(relPath string) (absPath string) {
-	return filepath.Join(sfs.rootFolderPath, relPath)
 }

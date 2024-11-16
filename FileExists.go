@@ -1,16 +1,22 @@
 package sfs
 
 import (
-	"path/filepath"
+	"errors"
 
 	"github.com/vault-thirteen/auxie/file"
 )
 
 func (sfs *SimpleFileServer) FileExists(relPath string) (fileExists bool, err error) {
-	if sfs.isCachingEnabled {
-		if sfs.fileExistsInCache(relPath) {
-			return true, nil
-		}
+	if !IsPathValid(relPath) {
+		return false, errors.New(Err_PathIsNotValid)
+	}
+
+	if !sfs.isCachingEnabled {
+		return sfs.fileExistsInStorage(relPath)
+	}
+
+	if sfs.fileExistsInCache(relPath) {
+		return true, nil
 	}
 
 	return sfs.fileExistsInStorage(relPath)
@@ -21,6 +27,5 @@ func (sfs *SimpleFileServer) fileExistsInCache(relPath string) (fileExists bool)
 }
 
 func (sfs *SimpleFileServer) fileExistsInStorage(relPath string) (fileExists bool, err error) {
-	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
-	return file.FileExists(absFilePath)
+	return file.FileExists(sfs.GetAbsolutePath(relPath))
 }

@@ -1,7 +1,23 @@
 package sfs
 
 import (
+	"path/filepath"
 	"strings"
+)
+
+const (
+	ForwardSlashString  = string(`/`)
+	BackwardSlashString = string(`\`)
+	PathLevelUp         = ".."
+)
+
+const (
+	Err_CgiExtraPathIsNotFound = "CGI extra path is not found"
+	Err_ActionIsImpossible     = "action is impossible"
+	Err_CacheIsDisabled        = "cache is disabled"
+	Err_FileIsNotFound         = "file is not found"
+	Err_FolderDoesNotExist     = "folder does not exist"
+	Err_PathIsNotValid         = "path is not valid"
 )
 
 // IsPathValid checks validity of the path.
@@ -27,4 +43,9 @@ func IsPathFolder(path string) bool {
 	}
 
 	return false
+}
+
+// GetAbsolutePath returns an absolute path from a relative one.
+func (sfs *SimpleFileServer) GetAbsolutePath(relPath string) (absPath string) {
+	return filepath.Join(sfs.rootFolderPath, relPath)
 }

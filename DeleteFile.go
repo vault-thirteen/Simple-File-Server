@@ -1,17 +1,37 @@
 package sfs
 
 import (
+	"errors"
 	"os"
-	"path/filepath"
 )
 
-// DeleteFile deletes a file from the storage.
 func (sfs *SimpleFileServer) DeleteFile(relPath string) (err error) {
-	if sfs.isCachingEnabled {
-		_, _ = sfs.cache.RemoveRecord(relPath)
+	if !IsPathValid(relPath) {
+		return errors.New(Err_PathIsNotValid)
 	}
 
-	absFilePath := filepath.Join(sfs.rootFolderPath, relPath)
+	if !sfs.isCachingEnabled {
+		return sfs.deleteFileFromStorage(relPath)
+	}
 
-	return os.Remove(absFilePath)
+	err = sfs.deleteFileFromCache(relPath)
+	if err != nil {
+		return err
+	}
+
+	err = sfs.deleteFileFromStorage(relPath)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (sfs *SimpleFileServer) deleteFileFromCache(relPath string) (err error) {
+	_, err = sfs.cache.RemoveRecord(relPath)
+	return err
+}
+
+func (sfs *SimpleFileServer) deleteFileFromStorage(relPath string) (err error) {
+	return os.Remove(sfs.GetAbsolutePath(relPath))
 }

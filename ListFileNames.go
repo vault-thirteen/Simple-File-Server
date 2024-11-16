@@ -1,16 +1,27 @@
 package sfs
 
 import (
+	"errors"
+
 	"github.com/vault-thirteen/auxie/file"
 )
 
-// ListFileNames lists name of all files in the storage folder. Cache is not
-// used while may not contain all the files.
-func (sfs *SimpleFileServer) ListFileNames() (fileNames []string, err error) {
-	fileNames, err = file.ListFileNames(sfs.rootFolderPath)
-	if err != nil {
-		return nil, err
+func (sfs *SimpleFileServer) ListFileNames(folderRelPath string) (fileNames []string, err error) {
+	if !IsPathValid(folderRelPath) {
+		return nil, errors.New(Err_PathIsNotValid)
 	}
 
-	return fileNames, nil
+	if !sfs.isCachingEnabled {
+		return sfs.listFileNamesFromStorage(folderRelPath)
+	}
+
+	return sfs.listFileNamesFromStorage(folderRelPath)
+}
+
+func (sfs *SimpleFileServer) listFileNamesFromCache(folderRelPath string) (fileNames []string, err error) {
+	return nil, errors.New(Err_ActionIsImpossible)
+}
+
+func (sfs *SimpleFileServer) listFileNamesFromStorage(folderRelPath string) (fileNames []string, err error) {
+	return file.ListFileNames(sfs.GetAbsolutePath(folderRelPath))
 }

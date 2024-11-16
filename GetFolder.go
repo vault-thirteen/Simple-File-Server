@@ -1,8 +1,24 @@
 package sfs
 
-// GetFolder returns contents of the first found default file of a folder.
-// Path is a relative path inside the file server's root folder.
+import "errors"
+
 func (sfs *SimpleFileServer) GetFolder(folderRelPath string) (bytes []byte, err error) {
+	if !IsPathValid(folderRelPath) {
+		return nil, errors.New(Err_PathIsNotValid)
+	}
+
+	if !sfs.isCachingEnabled {
+		return sfs.getFolderFromStorage(folderRelPath)
+	}
+
+	return sfs.getFolderFromStorage(folderRelPath)
+}
+
+func (sfs *SimpleFileServer) getFolderFromCache(folderRelPath string) (bytes []byte, err error) {
+	return nil, errors.New(Err_ActionIsImpossible)
+}
+
+func (sfs *SimpleFileServer) getFolderFromStorage(folderRelPath string) (bytes []byte, err error) {
 	var fileName string
 	fileName, err = sfs.GetFolderDefaultFilename(folderRelPath)
 	if err != nil {

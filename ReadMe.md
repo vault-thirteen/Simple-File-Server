@@ -23,5 +23,5 @@ all over your storage in order to disable file listing.
 * It is possible to configure a list of default files for a directory. When a 
 directory is requested, the server searches the list for a default file and 
 returns the first existing file found. To disable this feature, the list of 
-default files should be empty. To request a folder, the file path should end 
-with a slash symbol.
+default files should be empty. To request a folder, the requested path should 
+end with a slash symbol.
